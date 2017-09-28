@@ -1,12 +1,29 @@
 <?php
-	class Email{
-		private $recipient; 
-		private $sender;
-		private $subject;
-		private $message;
 
+	class Email{
+		// Variables
+		private $message;	// content for body of email
+		private $recipient;	// send to email address
+		private $sender;	// from email address
+		private $subject;	// content for subject line
+		
+		// Constructor method goes here
 		public function __construct($inRecipient){
-			$this->setRecipient($inRecipient);
+			//setRecipient($inRecipient); // set property value 
+			// above doesn't work cause top to bottom language
+			$this->recipient = $inRecipient;
+		}
+		//public function __construct(){ 	// Can't do this
+			
+		//}
+		
+		// Getters and Setters
+		public function setMessage($inMessage){
+			$this->message = $inMessage;
+		}
+		
+		public function getMessage(){
+			return $this->message;
 		}
 		
 		public function setRecipient($inRecipient){
@@ -17,37 +34,28 @@
 			return $this->recipient;
 		}
 		
-		public funcion setSender($inSender){
+		public function setSender($inSender){
 			$this->sender = $inSender;
 		}
-
+		
 		public function getSender(){
 			return $this->sender;
 		}
 		
-		public funcion setSubject($inSubject){
+		public function setSubject($inSubject){
 			$this->subject = $inSubject;
 		}
-
+		
 		public function getSubject(){
 			return $this->subject;
 		}
 		
-		public funcion setMessage($inMessage){
-			$this->message = $inMessage;
+		// Processing Methods
+		public sendMail(){
+			
 		}
-
-		public function getMessage(){
-			return $this->message;
-		}
-
-		public function sendMail(){
-			$to = $this->getRecipient();
-			$subject = $this->getSubject();
-			$messageTxt = wordwrap(this->getMessage(), 65, "\n", false);
-			$headers = 'From: ' . $this->getSender();
- 
-			return mail($to, $subject, $messageTxt, $headers);
-		}
-	}		
+		
+	}
 ?>
+	
+	
