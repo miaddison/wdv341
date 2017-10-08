@@ -1,0 +1,59 @@
+
+<!DOCTYPE HTML>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>WDV341 Intro PHP - Programming Project - Contact Form</title>
+</head>
+
+<body>
+<h1>WDV341 Intro PHP</h1>
+<h2>Programming Project - Contact Form</h2>
+<form name="form1" method="post" action="processForm.php">
+  <p>&nbsp;</p>
+  <p>
+    <label>Your Name:
+      <input type="text" name="name" id="name">
+    </label>
+  </p>
+  <p>Your Email: 
+    <input type="email" name="email" id="email">
+  </p>
+  <p>Reason for contact: 
+    <label>
+      <select name="reason" id="reason">
+        <option value="default">Please Select a Reason</option>
+        <option value="product">Product Problem</option>
+        <option value="return">Return a Product</option>
+        <option value="billing">Billing Question</option>
+        <option value="technical">Report a Website Problem</option>
+        <option value="other">Other</option>
+      </select>
+    </label>
+  </p>
+  <p>
+    <label>Comments:
+      <textarea name="comments" id="comments" cols="45" rows="5"></textarea>
+    </label>
+  </p>
+  <p>
+    <label>
+      <input type="checkbox" name="mailingList" id="mailingList" checked>
+      Please put me on your mailing list.</label>
+  </p>
+  <p>
+    <label>
+      <input type="checkbox" name="information" id="information" checked>
+      Send me more information</label>
+  about your products.  </p>
+  <p>
+    <input type="hidden" name="robotest" id="robotest">
+  </p>
+  <p>
+    <input type="submit" name="button" id="button" value="Submit">
+    <input type="reset" name="button2" id="button2" value="Reset">
+  </p>
+</form>
+<p>&nbsp;</p>
+</body>
+</html>
