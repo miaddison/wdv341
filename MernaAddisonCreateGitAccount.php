@@ -7,6 +7,5 @@
 
 <body>
 	<h1>Merna Addison</h1>
-	<p>learning git</p>
 </body>
 </html>
