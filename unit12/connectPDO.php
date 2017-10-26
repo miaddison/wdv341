@@ -1,8 +1,11 @@
 <?php
 $serverName = "localhost";
-$username = "admin";
-$password = "password";
-$database = "wdv341";
+$username = "miaddison_wdv";
+//$username = "admin";
+$password = "wdvpassword";
+//$password = "password";
+$database = "wdv_event";
+//$database = "wdv341";
 try{
 	$conn = new PDO("mysql:host = $serverName;dbname = $database", $username, $password);
 	// set the pDO error mode to exception

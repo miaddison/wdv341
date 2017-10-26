@@ -80,6 +80,23 @@
 			return $sanitized_event_Presenter;
 		}
 		
+		// Validate Event in Future
+		function isFutureDate($event_date){
+			return(strtotime($event_date) > time());
+		}
+		
+		// Validate Event Date is in Future
+		function futureDate($event_date){
+			$today = date('Y-m-d');
+			global $event_date_Err;
+			/*if($today > $event_date){
+				return false;
+			}else{
+				return true;
+			}*/
+			 $event_date_Err = $today;
+		}
+		
 		// Validate Event Date
 		function validateDate($event_date){
 			global $validForm, $event_date_Err;
@@ -88,7 +105,12 @@
 				$validForm = false;
 			}
 			$event_date = date('Y-m-d',strtotime($event_date));
-			return $event_date;
+			if(!isFutureDate($event_date)){
+				$event_date_Err = "*Please select a date in the future";
+				$validForm = false;
+			}else{
+				return $event_date;
+			}
 		}
 		
 		// Validate Event Time
@@ -116,6 +138,8 @@
 		$event_date = validateDate($event_date);
 		$event_time = validateTime($event_time);
 		
+		
+		
 		if($validForm)
 		{
 			$message = "All good";
@@ -124,7 +148,8 @@
 				require 'connectPDO.php'; // connect to the database
 				/*INSERT INTO `wdv341_event` (`event_id`, `event_name`, `event_description`, `event_presenter`, `event_date`, `event_time`) VALUES (NULL, 'name', 'description', 'presenter', '2017-10-26', '07:00:00')	*/
 				//Create the SQL command string
-				$sql = "INSERT INTO wdv341_event(";
+				//$sql = "INSERT INTO wdv341.wdv341_event(";
+				$sql = "INSERT INTO miaddison_wdv.wdv341_event(";
 				$sql .= "event_name, ";
 				$sql .= " event_description, ";
 				$sql .= " event_presenter, ";
@@ -152,7 +177,7 @@
 				
 				$message = "Your event has been added.";
 				
-				$conn->null;
+				//$conn->null;
 			}
 			
 			catch(PDOException $e)
@@ -161,6 +186,7 @@
 				
 				error_log($e->getMessage());			//Delivers a developer defined error message to the PHP log file at c:\xampp/php\logs\php_error_log
 				error_log(var_dump(debug_backtrace()));
+				
 				//Clean up any variables or connections that have been left hanging by this error.		
 			
 				//header('Location: files/505_error_response_page.php');	//sends control to a User friendly page					
@@ -203,19 +229,21 @@
 	{
 ?>
 		  <h1><?php echo $message?></h1>
-		  <p>
+		  
+		  <!--Testing outputs>
+		  <!--p>
 		  Event Name:
-		  <?php echo $event_name ?><br>
+		  <!--?php echo $event_name ?><br>
 		  Event Description:
-		  <?php echo $event_description ?><br>
+		  <!--?php echo $event_description ?><br>
 		  Event Presenter:
-		  <?php echo $event_presenter ?><br>
+		  <!--?php echo $event_presenter ?><br>
 		  Event Date: 
-		  <?php echo $event_date ?><br>
+		  <!--?php echo $event_date ?><br>
 		  Event Time: 
-		  <?php echo $event_time ?><br>
+		  <!--?php echo $event_time ?><br>
 		  SQL: 
-		  <?php echo $sql ?></p>
+		  <!--?php echo $sql ?></p-->
 		  
 		  
 <?php
