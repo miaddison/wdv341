@@ -4,7 +4,9 @@
 //needed to gather the data from the database table.  Format the data into a presentation
 //format that can be viewed on the client's browser.
 	$displayMsg = "";
-
+	
+try
+{
 	include 'dbConnectPDO.php';				//connects to the database
 	$sql = "SELECT event_name,event_description,event_presenter,event_date,event_time FROM miaddison_wdv.wdv341_event";
 	//$sql = "SELECT event_name,event_description,event_presenter,event_date,event_time FROM wdv341.wdv341_event";		//build the SQL command	
@@ -54,6 +56,14 @@
 		$displayMsg .= "<h3>Sorry there has been a problem</h3>";
 		//$displayMsg .= "<p>" . mysqli_error($con) . "</p>";			//Display error message
 	}
+}
+catch(PDOException $e)
+{
+	$message = "<h3>There has been a problem. The system administrator has been contacted. Please try again later.</h3>";
+			
+	error_log($e->getMessage());			//Delivers a developer defined error message to the PHP log file at c:\xampp/php\logs\php_error_log
+	error_log(var_dump(debug_backtrace()));								
+}
 	
 	
 	
