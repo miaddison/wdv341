@@ -73,7 +73,7 @@ catch(PDOException $e)
 ?>
 <html>
 <head>
-	<title>WDV341 SELECT Example</title>
+	<title>Create selectEvents.php</title>
 
 </head>
 <body>
