@@ -22,7 +22,7 @@
 		$cust_pref3_msg = "";
 		$cust_pref4_msg = "";
 		$dateTime = new DateTime("now", new DateTimeZone('America/Chicago'));
-		$cust_input_date = $dateTime->format('Y-m-d');;
+		$cust_date = $dateTime->format('Y-m-d');;
 		$roboTest = "";
 		$message = "";
 
@@ -79,16 +79,20 @@
 			$cust_pref_msg = "";
 			switch($cust_pref){
 				case "mw":
-					$cust_pref_msg = "Monday/Wednesday 10:00am-Noon";
+					//$cust_pref_msg = "Monday/Wednesday 10:00am-Noon";
+					$cust_pref_msg = "1";
 					break;
 				case "t":
-					$cust_pref_msg = "Tuesday 6:00-9:00pm";
+					//$cust_pref_msg = "Tuesday 6:00-9:00pm";
+					$cust_pref_msg = "2";
 					break;
 				case "w":						
-					$cust_pref_msg = "Wednesday 6:00-9:00pm";
+					//$cust_pref_msg = "Wednesday 6:00-9:00pm";
+					$cust_pref_msg = "3";
 					break;
 				case "tr":
-					$cust_pref_msg = "Tuesday/Thursday 10:10am-Noon";
+					//$cust_pref_msg = "Tuesday/Thursday 10:10am-Noon";
+					$cust_pref_msg = "4";
 					break;
 			}	
 			return $cust_pref_msg;
@@ -143,7 +147,7 @@
 				$sql .= " cust_pref2, ";
 				$sql .= " cust_pref3, ";
 				$sql .= " cust_pref4, ";
-				$sql .= " cust_input_date ";
+				$sql .= " cust_date ";
 				$sql .= ") VALUES (:custEmail, :custPref1, :custPref2, :custPref3, :custPref4, :custInputDate)";
 				
 				//PREPARE the SQL statement
@@ -160,7 +164,7 @@
 				$stmt->bindParam(':custPref2', $cust_pref2_msg);
 				$stmt->bindParam(':custPref3', $cust_pref3_msg);		
 				$stmt->bindParam(':custPref4', $cust_pref4_msg);
-				$stmt->bindParam(':custInputDate', $cust_input_date);
+				$stmt->bindParam(':custInputDate', $cust_date);
 				
 				
 				//EXECUTE the prepared statement
