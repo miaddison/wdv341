@@ -35,7 +35,7 @@ try
 				$meal_id = $row["id"];
 				$displayMsg .= "<a href='viewMeal.php?meal_id=$meal_id'>  View  </a>";
 				$displayMsg .= "</td><td>";
-				$displayMsg .= "<a href='mealsForm.php?meal_id=$meal_id'>  Update  </a>";
+				$displayMsg .= "<a href='mealForm.php?meal_id=$meal_id'>  Update  </a>";
 				$displayMsg .= "</td><td>";
 				$displayMsg .= "<a href='deleteMeal.php?meal_id=$meal_id'>  Delete  </a>";
   				$displayMsg .= "</td></tr>";

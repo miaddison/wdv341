@@ -77,7 +77,7 @@
 		
 		// validate not robot
 		if($roboTest){
-			$displayMsg = "*No bots allowed! Email not sent!";
+			$displayMsg = "<h2>*No bots allowed! Email not sent!</h2>";
 			$validForm = false;
 		}
 		
@@ -89,7 +89,7 @@
 		
 		if($validForm)
 		{
-			$displayMsg = "All good";
+			$displayMsg = "<h2>All good</h2>";
 			try 
 			{
 				
@@ -155,18 +155,18 @@
 					//EXECUTE the prepared statement
 					$stmt->execute();	
 
-					$displayMsg = "Your event has been added.";
+					$displayMsg = "<h2>Your event has been added.</h2>";
 					$displayMsg .= "<h2>Please <a href='selectEvents.php'>view</a> your records.</h2>";
 				
 				}
 				
 				
-				//$conn->null;
+				
 			}
 			
 			catch(PDOException $e)
 			{
-				$displayMsg = "There has been a problem. The system administrator has been contacted. Please try again later.";
+				$displayMsg = "<h2>There has been a problem. The system administrator has been contacted. Please try again later.</h2>";
 				
 				error_log($e->getMessage());			//Delivers a developer defined error message to the PHP log file at c:\xampp/php\logs\php_error_log
 				
@@ -183,7 +183,7 @@
 		}
 		else
 		{
-			$displayMsg = "Something went wrong";
+			$displayMsg = "<h2>Something went wrong</h2>";
 		}//end check for valid form
 		
 	}
@@ -191,46 +191,75 @@
 	{
 		try{
 			//user has not seen form yet
-			$update_meal_id=$_GET['meal_id'];
-			require 'dbConnectPDO.php'; // connect to the database
-			
-			$sql = "SELECT id, mealname FROM miaddison_meals.meals WHERE id=$update_meal_id";
-			
-			//PREPARE the SQL statement
-			$stmt = $conn->prepare($sql);
-			$stmt->bindParam(':id', $update_meal_id);
-			$stmt->execute();
-			
-			$sql2 = "SELECT ingredient FROM miaddison_meals.ingredients WHERE id=$update_meal_id";
-			
-			//PREPARE the SQL statement
-			$stmt2 = $conn->prepare($sql2);
-			$stmt2->bindParam(':id', $update_meal_id);
-			$stmt2->execute();
-			
-			$sql3 = "SELECT direction FROM miaddison_meals.directions WHERE id=$update_meal_id";
-			
-			//PREPARE the SQL statement
-			$stmt3 = $conn->prepare($sql3);
-			$stmt3->bindParam(':id', $update_meal_id);
-			$stmt3->execute();
-			
-			
+			$update_meal_id=$_GET['meal_id']; // user updating 
+			if($update_meal_id != ""){
+				require 'dbConnectPDO.php'; // connect to the database
 
-			if($stmt && $stmt2 && $stmt3) // test that query was made
-			{
-				$meal_mealname = $row['mealname'];
-				
-				/*while($row=$stmt->fetch(PDO::FETCH_ASSOC)){
-					$event_name = $row['event_name'];
-					$event_description = $row['event_description'];
-					$event_presenter = $row['event_presenter'];
-					$event_date = $row['event_date'];
-					$event_time = $row['event_time'];
-					$update_event_id = $row['event_id'];
-				}*/
-			}else{
-				$message = "No record found";
+				$sql = "SELECT id, mealname FROM miaddison_meals.meals WHERE id=:id";
+
+				//PREPARE the SQL statement
+				$stmt = $conn->prepare($sql);
+				$stmt->bindParam(':id', $update_meal_id);
+				$stmt->execute();
+
+				$sql2 = "SELECT ingredient FROM miaddison_meals.ingredients WHERE id=:id";
+
+				//PREPARE the SQL statement
+				$stmt2 = $conn->prepare($sql2);
+				$stmt2->bindParam(':id', $update_meal_id);
+				$stmt2->execute();
+
+				$sql3 = "SELECT direction FROM miaddison_meals.directions WHERE id=:id";
+
+				//PREPARE the SQL statement
+				$stmt3 = $conn->prepare($sql3);
+				$stmt3->bindParam(':id', $update_meal_id);
+				$stmt3->execute();
+
+
+
+				if($stmt && $stmt2 && $stmt3) // test that query was made
+				{
+					$row=$stmt->fetch(PDO::FETCH_ASSOC);
+					$meal_mealname = $row['mealname'];
+					// Meal name input
+					$displayMsg .= "<form name='eventForm' method='post' action='eventsForm.php'>";
+					$displayMsg .= "<p>&nbsp;</p>";
+					$displayMsg .= "<p>";
+					$displayMsg .= "<label>Meal Name:";
+					$displayMsg .= "<input type='text' name='meal_mealname' id='meal_mealname' value='$meal_mealname'><span class='error' style='color:red; padding-left:2em'>$meal_mealname_Err</span>";
+					$displayMsg .= "</label>";
+					$displayMsg .= "</p>";
+					// ingredients
+					$count = 0;
+					while($row2=$stmt2->fetch(PDO::FETCH_ASSOC)){
+						$count++;
+						$meal_ingredients = $row2['ingredient'];
+						$displayMsg .= "<p>Ingredient Number $count:";
+						$displayMsg .= "<textarea name='meal_ingredients' id='meal_ingredients' cols='45' rows='5'>$meal_ingredients</textarea><span class='error' style='color:red; padding-left:2em'>$meal_ingredients_Err</span>";
+						$displayMsg .= "</p>";
+					}
+					// directions
+					$count = 0;
+					while($row3=$stmt3->fetch(PDO::FETCH_ASSOC)){
+						$count++;
+						$meal_directions = $row3['direction'];
+						$displayMsg .= "<p>Direction Number $count:";
+						$displayMsg .= "<textarea name='meal_directions' id='meal_directions' cols='45' rows='5'>$meal_directions</textarea><span class='error' style='color:red; padding-left:2em'>$meal_directions_Err</span>";
+						$displayMsg .= "</p>";
+					}
+					// robotest
+					$displayMsg .= "<p><input type='hidden' name='update_meal_id' id='update_meal_id' value='$update_meal_id'>";
+					$displayMsg .= "</p><p>";
+					$displayMsg .= "<input type='hidden' name='robotest' id='robotest'>";
+					$displayMsg .= "</p><p>";
+					// buttons
+					$displayMsg .= "<input type='submit' name='submit' id='submit' value='Submit'>";
+					$displayMsg .= "<input type='button' name='button2' id='button2' value='Reset' onClick = resetForm()>";
+					$displayMsg .= "</p></form>";
+				}else{
+					$message = "No record found";
+				}
 			}
 		}
 		catch(PDOException $e)
@@ -321,33 +350,6 @@
 	{
 ?>
 		<h2><?php echo $displayMsg?></h2>
-		<form name="eventForm" method="post" action="eventsForm.php">
-		  <p>&nbsp;</p>
-		  <p>
-			<label>Meal Name:
-				<input type="text" name="meal_mealname" id="meal_mealname" value="<?php echo $meal_mealname ?>"><span class="error" style="color:red; padding-left:2em"><?php echo $meal_mealname_Err ?></span>
-			</label>
-		  </p>
-		  <p>Number of Meal Ingredients: 
-			  <textarea name="meal_ingredients" id="meal_ingredients" cols="45" rows="5"><?php echo $meal_ingredients ?></textarea><span class="error" style="color:red; padding-left:2em"><?php echo $meal_ingredients_Err ?></span>
-		  </p>
-		  <p>
-			<label>Number of Meal Directions:
-				<input type="text" name="meal_directions" id="meal_directions" value="<?php echo $meal_directions ?>"><span class="error" style="color:red; padding-left:2em"><?php echo $meal_directions_Err ?></span>
-			</label>
-		  </p>
-		  <p>
-			<input type="hidden" name="update_meal_id" id="update_meal_id" value="<?php echo $update_meal_id;?>">
-		  </p>
-		  <p>
-			<input type="hidden" name="robotest" id="robotest">
-		  </p>
-		  <p>
-			<input type="submit" name="submit" id="submit" value="Submit">
-			<input type="button" name="button2" id="button2" value="Reset" 
-			 onClick = resetForm()>
-		  </p>
-		</form>
 <?php
 	} // end else
 ?>
