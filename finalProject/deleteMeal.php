@@ -11,9 +11,12 @@ try
 	
 	include 'dbConnectPDO.php';				//connects to the database
 	
-	$sql = "DELETE FROM miaddison_meals.meals WHERE id = :id";
-	$sql2 = "DELETE FROM miaddison_meals.ingredients WHERE id = :id";
-	$sql3 = "DELETE FROM miaddison_meals.directions WHERE id = :id";
+	//$sql = "DELETE FROM miaddison_meals.meals WHERE id = :id";
+	//$sql2 = "DELETE FROM miaddison_meals.ingredients WHERE id = :id";
+	//$sql3 = "DELETE FROM miaddison_meals.directions WHERE id = :id";
+	$sql = "DELETE FROM meals.meals WHERE id = :id";
+	$sql2 = "DELETE FROM meals.ingredients WHERE id = :id";
+	$sql3 = "DELETE FROM meals.directions WHERE id = :id";
 
 	//PREPARE the SQL statements
 	$stmt = $conn->prepare($sql);
@@ -74,7 +77,8 @@ finally
 </header>
 <nav>
 	<ul>
-		<li><a href = "selectMeals.php">Home</a></li>
+		<li><a href = "selectMeals.php">View All</a></li>
+		<li><a href = "mealForm.php">Add New</a></li>
 	</ul>
 </nav>
 <main>

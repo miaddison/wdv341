@@ -11,9 +11,12 @@ try
 	
 	include 'dbConnectPDO.php';				//connects to the database
 	
-	$sql = "SELECT mealname FROM miaddison_meals.meals WHERE id = :id";
-	$sql2 = "SELECT ingredient FROM miaddison_meals.ingredients WHERE id = :id";
-	$sql3 = "SELECT direction FROM miaddison_meals.directions WHERE id = :id";
+	//$sql = "SELECT mealname FROM miaddison_meals.meals WHERE id = :id";
+	//$sql2 = "SELECT ingredient FROM miaddison_meals.ingredients WHERE id = :id";
+	//$sql3 = "SELECT direction FROM miaddison_meals.directions WHERE id = :id";
+	$sql = "SELECT mealname FROM meals.meals WHERE id = :id";
+	$sql2 = "SELECT ingredient FROM meals.ingredients WHERE id = :id";
+	$sql3 = "SELECT direction FROM meals.directions WHERE id = :id";
 
 	//PREPARE the SQL statement
 	$stmt = $conn->prepare($sql);
@@ -101,7 +104,8 @@ finally
 </header>
 <nav>
 	<ul>
-		<li><a href = "selectMeals.php">Home</a></li>
+		<li><a href = "selectMeals.php">View All</a></li>
+		<li><a href = "mealForm.php">Add New</a></li>
 	</ul>
 </nav>
 <main>

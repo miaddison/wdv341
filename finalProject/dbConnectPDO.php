@@ -1,7 +1,9 @@
 <?php
-
-$username = "miaddison_meals";	//database/username from control panel
-$password = "password";	//database password	from control panel for the 
+$serverName = "localhost";
+//$username = "miaddison_meals";	//database/username from control panel
+$username = "admin";
+//$password = "password";	//database password	from control panel for the 
+$password = "password";
 $database = "meals";	//name of database/username from control panel
 
 try{

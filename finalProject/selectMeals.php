@@ -8,8 +8,8 @@
 try
 {
 	include 'dbConnectPDO.php';				//connects to the database
-	$sql = "SELECT id, mealname FROM miaddison_meals.meals";
-
+	//$sql = "SELECT id, mealname FROM miaddison_meals.meals";
+	$sql = "SELECT id, mealname FROM meals.meals";
 	//PREPARE the SQL statement
 	$stmt = $conn->prepare($sql);
 	$stmt->execute();
@@ -85,7 +85,8 @@ finally
 </header>
 <nav>
 	<ul>
-		<li><a href = "selectMeals.php">Home</a></li>
+		<li><a href = "selectMeals.php">View All</a></li>
+		<li><a href = "mealForm.php">Add New</a></li>
 	</ul>
 </nav>
 <main>
