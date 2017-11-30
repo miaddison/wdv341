@@ -10,7 +10,7 @@ try{
 	$event_day = "";
 	$event_time = "";
 	
-	$sql = "SELECT event_id,event_name,event_description,event_presenter,DATE_FORMAT(event_day,'%m/%d/%Y') AS event_day,event_time FROM miaddison_wdv.wdv341_events";
+	$sql = "SELECT event_id,event_name,event_description,event_presenter,DATE_FORMAT(event_day,'%m/%d/%Y') AS event_day,DATE_FORMAT( event_time,'%l:%i %p' )AS event_time FROM miaddison_wdv.wdv341_events";
 	//$sql = "SELECT event_id,event_name,event_description,event_presenter,DATE_FORMAT(event_day,'%m/%d/%Y') AS event_day,event_time FROM wdv341.wdv341_events";
 	
 	$query = $conn->prepare($sql);
