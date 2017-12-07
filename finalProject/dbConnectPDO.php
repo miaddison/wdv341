@@ -1,10 +1,11 @@
 <?php
 $serverName = "localhost";
-//$username = "miaddison_meals";	//database/username from control panel
-$username = "admin";
-//$password = "password";	//database password	from control panel for the 
-$password = "password";
-$database = "meals";	//name of database/username from control panel
+$username = "miaddison_meals";	//database/username from control panel
+//$username = "admin";
+$password = "password";	//database password	from control panel for the 
+//$password = "password";
+$database = "miaddison_meals";
+//$database = "meals";	//name of database/username from control panel
 
 try{
 	$conn = new PDO("mysql:host = $serverName;dbname = $database", $username, $password);

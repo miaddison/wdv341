@@ -12,12 +12,12 @@ try
 	include 'dbConnectPDO.php';				//connects to the database
 	
 	// Remote SQL
-	$sql = "SELECT mealname FROM miaddison_meals.meals WHERE id = :id";
+	$sql = "SELECT mealname, photo FROM miaddison_meals.meals WHERE id = :id";
 	$sql2 = "SELECT ingredient FROM miaddison_meals.ingredients WHERE id = :id";
 	$sql3 = "SELECT direction FROM miaddison_meals.directions WHERE id = :id";
 	
 	// Local SQL
-	//$sql = "SELECT mealname FROM meals.meals WHERE id = :id";
+	//$sql = "SELECT mealname photo FROM meals.meals WHERE id = :id";
 	//$sql2 = "SELECT ingredient FROM meals.ingredients WHERE id = :id";
 	//$sql3 = "SELECT direction FROM meals.directions WHERE id = :id";
 
@@ -41,7 +41,8 @@ try
 		{
 			//display recipe name
 			$row = $stmt->fetch(PDO::FETCH_ASSOC);
-			$displayMsg = "<h2 class = center>".$row["mealname"]."</h2>";	
+			$displayMsg = '<p class = center><img src = "images/'.$row["photo"].'" alt="recipe photo" style="max-height:400px; max-width:400px"></p>';
+			$displayMsg .= "<h2 class = center>".$row["mealname"]."</h2>";	
 					
 			//begin bullet list of ingredients
 			$displayMsg .= "<ul>";
@@ -96,11 +97,14 @@ finally
 <html>
 <head>
 	<title>View Recipe</title>
-	<link href= "style.css" rel= "stylesheet" type= "text/css"/>
+	<link href= "adminstyle.css" rel= "stylesheet" type= "text/css"/>
 	<link href = "printstyle.css" rel = "stylesheet" type = "text/css" media = "print" />
 </head>
 <body>
 <div id = "container">
+<div id = "login">
+	<a href = "login.php">Login</a>
+</div>
 <header>
 	<h1>View Recipe</h1>
 </header>

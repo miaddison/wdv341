@@ -7,46 +7,40 @@
 	
 try
 {
+	$meal_id = $_GET['meal_id']; // retrieve id from GET parameter
+	
 	include 'dbConnectPDO.php';				//connects to the database
-	$sql = "SELECT id, mealname FROM miaddison_meals.meals";
-	//$sql = "SELECT id, mealname FROM meals.meals";
-	//PREPARE the SQL statement
-	$stmt = $conn->prepare($sql);
-	$stmt->execute();
+	
+	// Remote SQL
+	$sql = "DELETE FROM miaddison_meals.meals WHERE id = :id";
+	$sql2 = "DELETE FROM miaddison_meals.ingredients WHERE id = :id";
+	$sql3 = "DELETE FROM miaddison_meals.directions WHERE id = :id";
+	
+	// Local SQL
+	//$sql = "DELETE FROM meals.meals WHERE id = :id";
+	//$sql2 = "DELETE FROM meals.ingredients WHERE id = :id";
+	//$sql3 = "DELETE FROM meals.directions WHERE id = :id";
 
-	if($stmt) // test that query was made
+	//PREPARE the SQL statements
+	$stmt = $conn->prepare($sql);
+	$stmt->bindParam(':id',$meal_id);
+	$stmt->execute();
+	
+	$stmt2 = $conn->prepare($sql2);
+	$stmt2->bindParam(':id',$meal_id);
+	$stmt2->execute();
+	
+	$stmt3 = $conn->prepare($sql3);
+	$stmt3->bindParam(':id',$meal_id);
+	$stmt3->execute();
+
+	if($stmt && $stmt2 && $stmt3) // test that query was made
 	{
-		//process the result
-		if ($stmt->rowCount() > 0) 
-		{
-			$displayMsg = "<h1 class = center>" . $stmt->rowCount() . " Recipes have been found</h1>";	
-			$displayMsg .= "<table>";
-			$displayMsg .= "<tr>";
-			$displayMsg .= "<th>Meal Name</th>";
-			//$displayMsg .= "<th>View</th>";
-			//$displayMsg .= "<th>Update</th>";
-			//$displayMsg .= "<th>Delete</th>";
-			$displayMsg .= "</tr>";
-			
-			while($row = $stmt->fetch(PDO::FETCH_ASSOC)){
-				$displayMsg .= "<tr><td>";
-				$meal_name = $row["mealname"];
-				//$displayMsg .= "</td><td>";
-				$meal_id = $row["id"];
-				$displayMsg .= "<a href='viewMeal.php?meal_id=$meal_id'> $meal_name </a>";
-				//$displayMsg .= "</td><td>";
-				//$displayMsg .= "<a href='mealForm.php?meal_id=$meal_id'>  Update  </a>";
-				//$displayMsg .= "</td><td>";
-				//$displayMsg .= "<a href='deleteMeal.php?meal_id=$meal_id'>  Delete  </a>";
-  				$displayMsg .= "</td></tr>";
-			}
-			
-			$displayMsg .= "</table>";
-		} 
-		else 
-		{
-			$displayMsg .= "0 results";
-		}		
+		// test that query was made
+		if($stmt){
+			$displayMsg =  "<h2>Your recipe has been successfully deleted.</h2>";
+			$displayMsg .= "<p>Please <a href='selectMeals.php'>view</a> your recipes.</p>";
+		}	
 	}
 	else
 	{
@@ -75,7 +69,8 @@ finally
 <html>
 <head>
 	<title>Select Recipes</title>
-	<link href= "style.css" rel= "stylesheet" type= "text/css"/>
+	<link href= "adminstyle.css" rel= "stylesheet" type= "text/css"/>
+	<link href = "printstyle.css" rel = "stylesheet" type = "text/css" media = "print" />
 </head>
 <body>
 <div id = "container">
@@ -83,7 +78,7 @@ finally
 	<a href = "login.php">Login</a>
 </div>
 <header>
-	<h1>Select Recipes</h1>
+	<h1>Delete Recipes</h1>
 </header>
 <nav>
 	<ul>

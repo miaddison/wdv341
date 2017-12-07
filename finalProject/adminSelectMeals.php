@@ -7,43 +7,51 @@
 	
 try
 {
-	$meal_id = $_GET['meal_id']; // retrieve id from GET parameter
-	
 	include 'dbConnectPDO.php';				//connects to the database
-	
-	//$sql = "DELETE FROM miaddison_meals.meals WHERE id = :id";
-	//$sql2 = "DELETE FROM miaddison_meals.ingredients WHERE id = :id";
-	//$sql3 = "DELETE FROM miaddison_meals.directions WHERE id = :id";
-	$sql = "DELETE FROM meals.meals WHERE id = :id";
-	$sql2 = "DELETE FROM meals.ingredients WHERE id = :id";
-	$sql3 = "DELETE FROM meals.directions WHERE id = :id";
-
-	//PREPARE the SQL statements
+	$sql = "SELECT id, mealname FROM miaddison_meals.meals";
+	//$sql = "SELECT id, mealname FROM meals.meals";
+	//PREPARE the SQL statement
 	$stmt = $conn->prepare($sql);
-	$stmt->bindParam(':id',$meal_id);
 	$stmt->execute();
-	
-	$stmt2 = $conn->prepare($sql2);
-	$stmt2->bindParam(':id',$meal_id);
-	$stmt2->execute();
-	
-	$stmt3 = $conn->prepare($sql3);
-	$stmt3->bindParam(':id',$meal_id);
-	$stmt3->execute();
 
-	if($stmt && $stmt2 && $stmt3) // test that query was made
+	if($stmt) // test that query was made
 	{
-		// test that query was made
-		if($stmt){
-			$displayMsg =  "<h2>Your recipe has been successfully deleted.</h2>";
-			$displayMsg .= "<p>Please <a href='selectMeals.php'>view</a> your recipes.</p>";
-		}	
+		//process the result
+		if ($stmt->rowCount() > 0) 
+		{
+			$displayMsg = "<h1 class = center>" . $stmt->rowCount() . " Recipes have been found</h1>";	
+			$displayMsg .= "<table>";
+			$displayMsg .= "<tr>";
+			$displayMsg .= "<th>Meal Name</th>";
+			$displayMsg .= "<th>View</th>";
+			$displayMsg .= "<th>Update</th>";
+			$displayMsg .= "<th>Delete</th>";
+			$displayMsg .= "</tr>";
+			
+			while($row = $stmt->fetch(PDO::FETCH_ASSOC)){
+				$displayMsg .= "<tr><td>";
+				$displayMsg .= $row["mealname"];
+				$displayMsg .= "</td><td>";
+				$meal_id = $row["id"];
+				$displayMsg .= "<a href='adminViewMeal.php?meal_id=$meal_id'>  View  </a>";
+				$displayMsg .= "</td><td>";
+				$displayMsg .= "<a href='adminMealForm.php?meal_id=$meal_id'>  Update  </a>";
+				$displayMsg .= "</td><td>";
+				$displayMsg .= "<a href='adminDeleteMeal.php?meal_id=$meal_id'>  Delete  </a>";
+  				$displayMsg .= "</td></tr>";
+			}
+			
+			$displayMsg .= "</table>";
+		} 
+		else 
+		{
+			$displayMsg .= "0 results";
+		}		
 	}
 	else
 	{
 		//display error message for DEVELOPMENT purposes
 		$displayMsg .= "<h3>Sorry there has been a problem</h3>";
-		//$displayMsg .= "<p>" . mysqli_error($con) . "</p>";			//Display error message
 	}
 }
 catch(PDOException $e)
@@ -67,13 +75,15 @@ finally
 <html>
 <head>
 	<title>Select Recipes</title>
-	<link href= "style.css" rel= "stylesheet" type= "text/css"/>
-	<link href = "printstyle.css" rel = "stylesheet" type = "text/css" media = "print" />
+	<link href= "adminstyle.css" rel= "stylesheet" type= "text/css"/>
 </head>
 <body>
 <div id = "container">
+<div id = "login">
+	<a href = "login.php">Login</a>
+</div>
 <header>
-	<h1>Delete Recipes</h1>
+	<h1>Select Recipes</h1>
 </header>
 <nav>
 	<ul>
