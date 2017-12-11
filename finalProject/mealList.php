@@ -15,13 +15,14 @@ $num_meals = $_SESSION['mealNum'];
 //$num_meals = $_SESSION['mealNum'][0];
 //$num_meals_array = $_SESSION['mealNum'];
 //$num_meals= array_pop($num_meals_array);
-//$num_meals = 2;
+//$num_meals = 3;
 //$userMessage .=" ".$num_meals;
 
 		try
 		{
 			include 'dbConnectPDO.php';				//connects to the database
 			$sql = "SELECT id, mealname FROM miaddison_meals.meals ORDER BY RAND() LIMIT $num_meals";
+			//$sql = "SELECT id, mealname FROM meals.meals ORDER BY RAND() LIMIT $num_meals";
 			//$sql = "SELECT id, mealname FROM miaddison_meals.meals ORDER BY RAND() LIMIT :numMeals";
 			//$sql = "SELECT id, mealname FROM meals.meals";
 			//foreach($_SESSION['mealNum'] as $mealnum){
@@ -37,37 +38,28 @@ $num_meals = $_SESSION['mealNum'];
 					//if ($stmt->rowCount() > 0) 
 					//{
 						//$displayMsg = "<h2 class = center>" . $stmt->rowCount() . " Recipes have been selected for you</h2>";	
-						//$displayMsg .='<form name="selectedMeals" method="post" action="selectedMeals.php">';
+						$displayMsg .='<form name="selectedMeals" method="post" action="selectedMeals.php">';
 						$displayMsg .= "<table>";
 						$displayMsg .= "<tr>";
-						//$displayMsg .= "<th>Select</th>";
+						$displayMsg .= "<th>Select</th>";
 						$displayMsg .= "<th>Meal Name</th>";
-						//$displayMsg .= "<th>View</th>";
-						//$displayMsg .= "<th>Update</th>";
-						//$displayMsg .= "<th>Delete</th>";
 						$displayMsg .= "</tr>";
-
+						
+						// off by one fix
+						//$displayMsg .= "<input type='hidden' name='mealId[]' id='mealId' checked='checked' value='$meal_id'>";
 						while($row = $stmt->fetch(PDO::FETCH_ASSOC)){
-							$displayMsg .= "<tr>";
-							//$displayMsg .= '<td><input type = "checkbox" name = "id" checked = "checked" value = "$meal_id"></td>';
 							$meal_name = $row["mealname"];
-							//$displayMsg .= "</td><td>";
 							$meal_id = $row["id"];
-							$displayMsg .= "<td><a href='viewMeal.php?meal_id=$meal_id'> $meal_name </a>";
-							//$displayMsg .= "</td><td>";
-							//$displayMsg .= "<a href='mealForm.php?meal_id=$meal_id'>  Update  </a>";
-							//$displayMsg .= "</td><td>";
-							//$displayMsg .= "<a href='deleteMeal.php?meal_id=$meal_id'>  Delete  </a>";
+							$displayMsg .= "<tr>";
+							$displayMsg .= "<td><input type='checkbox' name='mealId[]' id='mealId' checked='checked' value='$meal_id'></td>";
+							$displayMsg .= "<td><a href='viewMeal.php?meal_id=$meal_id' target='_blank'> $meal_name </a>";
 							$displayMsg .= "</td></tr>";
 						}
-						//$displayMsg .= add buttons
+						
 						$displayMsg .= "</table>";
-						//$displayMsg .="</form>";
-					//} 
-					//else 
-					//{
-					//	$displayMsg .= "0 results";
-					//}		
+						$displayMsg .= "<p><button formaction='mealPick.php' type='submit'>Try again</button>";
+						$displayMsg .='<input type="submit" name="submit" id="submit" value="Submit"></p>';
+						$displayMsg .="</form>";
 				}
 				else
 				{

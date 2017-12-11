@@ -339,8 +339,8 @@ if ($_SESSION['validUser'] == "yes") {
 			$displayMsg .= "<input type='hidden' name='robotest' id='robotest'>";
 			$displayMsg .= "<p>";
 			// buttons
-			$displayMsg .= "<input type='submit' name='submit' id='submit' value='Submit'>";
 			$displayMsg .= "<input type='button' name='button2' id='button2' value='Reset' onClick = resetForm()>";
+			$displayMsg .= "<input type='submit' name='submit' id='submit' value='Submit'>";
 			$displayMsg .= "</p></table></form>";
 		}
 	}
@@ -434,8 +434,8 @@ if ($_SESSION['validUser'] == "yes") {
 					$displayMsg .= "<input type='hidden' name='robotest' id='robotest'>";
 					$displayMsg .= "<p>";
 					// buttons
-					$displayMsg .= "<input type='submit' name='submit' id='submit' value='Submit'>";
 					$displayMsg .= "<input type='button' name='button2' id='button2' value='Reset' onClick = resetForm()>";
+					$displayMsg .= "<input type='submit' name='submit' id='submit' value='Submit'>";
 					$displayMsg .= "</p></table></form>";
 				}else{
 					$message = "No record found";
@@ -470,8 +470,8 @@ if ($_SESSION['validUser'] == "yes") {
 				$displayMsg .= "<p><input type='hidden' name='update_meal_id' id='update_meal_id'>";
 				$displayMsg .= "</p><p>";
 				// buttons
-				$displayMsg .= "<input type='submit' name='submit' id='submit' value='Submit'>";
 				$displayMsg .= "<input type='button' name='button2' id='button2' value='Reset' onClick = resetForm()>";
+				$displayMsg .= "<input type='submit' name='submit' id='submit' value='Submit'>";
 				$displayMsg .= "</p></div><!--end form input--></form>";
 			}
 		}

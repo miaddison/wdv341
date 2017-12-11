@@ -41,3 +41,8 @@ img{
 img.full{
 	display: none;
 }
+@media print {
+	.noprint{
+		display:none;
+	}
+}

@@ -141,7 +141,7 @@ else
                   <p>Password: <input name="loginPassword" type="password" /></p>
                   <p>Username: wdv341<br>
 					  Password: wdv341</p>
-                  <p><input name="submitLogin" value="Login" type="submit" /> <input name="" type="reset" />&nbsp;</p>
+                  <p><input name="reset" type="reset" /><input name="submitLogin" value="Submit" type="submit" /> &nbsp;</p>
                 </form>
                 
 <?php //turn off HTML and turn on PHP
