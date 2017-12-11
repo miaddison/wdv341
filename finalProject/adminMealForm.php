@@ -5,15 +5,17 @@
 	Course: WDV341 Intro to PHP
 -->
 <?php
-//session_start(); // join current session equivalent to cookies in browser
+session_start(); // join current session equivalent to cookies in browser
 //Only allow a valid user access to this page
-//if ($_SESSION['validUser'] !== "yes") {
-//	header('Location: index.php'); // if not valid user redirect to homepage
-//}
+if ($_SESSION['validUser'] == "yes") {
+		$username = $_SESSION['username'];			
+		$userMessage = "Welcome Back $username!";	//Create greeting for VIEW area		
+		
 	//Setup variables used by the page	
 		// field data
 		$meal_id = "";
 		$meal_mealname = "";
+		$photo_name = "";
 		$meal_ingredients = "";
 		$num_meal_ingredients = 0;
 		$meal_directions = "";
@@ -21,6 +23,9 @@
 		$roboTest = "";
 		$displayMsg = "";
 		$update_meal_id = "";
+		$dateTime = new DateTime("now", new DateTimeZone('America/Chicago'));
+		$update_date = $dateTime->format('Y-m-d');
+		$update_time = $dateTime->format('H:i:s');
 
 		// Error messages
 		$meal_mealname_Err = "";
@@ -44,6 +49,34 @@
 	if(isset($_POST["submit"]))
 	{
 		// the form has been sumitted and needs to be processed
+		
+		// check that photo was uploaded without errors
+		if(isset($_FILES['photo']) && $_FILES['photo']['error'] == 0){
+			$allowed = array("jpg" => "image/jpg", "jpeg" => "image/jpeg", "gif" => "image/gif", "png" => "image/png");
+			$photo_name = $_FILES['photo']['name'];
+			//echo $photo_name;
+			$photo_type = $_FILES['photo']['type'];
+			
+			// Verify file extension
+			$ext = pathinfo($photo_name, PATHINFO_EXTENSION);
+			if(!array_key_exists($ext, $allowed)) die("Error: Please select a valid file format.");
+				
+			// Verify file type
+			if(in_array($photo_type, $allowed)){
+				// Check whether file exists before uploading
+				if(file_exists("images/".$_FILES['photo']['name'])){
+					//echo $_FILES['photo']['name']." already exists.";
+				}else{
+					move_uploaded_file($_FILES['photo']['tmp_name'], "images/".$_FILES['photo']['name']);
+					//echo "Your file was uploaded successfully.";
+				}
+			}else{
+				$displayMsg .= "<h2>Error: there was a problem uploading your file. Please try again.</h2>";
+			}
+		}else{
+			//echo "Error: ".$_FILES['photo']['error'];
+		}
+		
 		$num_meal_ingredients = $_POST['num_meal_ingredients'];
 		$num_meal_directions = $_POST['num_meal_directions'];
 		$meal_mealname = $_POST['meal_mealname'];
@@ -130,16 +163,26 @@
 				require 'dbConnectPDO.php'; // connect to the database
 	
 				if($update_meal_id!=""){
-					$sql = "UPDATE miaddison_meals.meals SET";
-					//$sql = "UPDATE meals.meals SET";
-					$sql .= " mealname=:mealName";
-					$sql .=" WHERE id=:update_meal_id";
-					
-					//PREPARE the SQL statement
-					$stmt = $conn->prepare($sql);
-					$stmt->bindParam(':mealName', $meal_mealname);
-					$stmt->bindParam(':update_meal_id', $update_meal_id);
-					$stmt->execute();
+						$sql = "UPDATE miaddison_meals.meals SET";
+						//$sql = "UPDATE meals.meals SET";
+						$sql .= " mealname=:mealName,";
+						if($photo_name!=""){
+							$sql .= " photo=:mealPhoto,";
+						}
+						$sql .= " update_date=:updateDate,";
+						$sql .= " update_time=:updateTime";
+						$sql .=" WHERE id=:update_meal_id";
+
+						//PREPARE the SQL statement
+						$stmt = $conn->prepare($sql);
+						$stmt->bindParam(':mealName', $meal_mealname);
+						if($photo_name!=""){
+							$stmt->bindParam(':mealPhoto', $photo_name);
+						}
+						$stmt->bindParam(':updateDate', $update_date);
+						$stmt->bindParam(':updateTime', $update_time);
+						$stmt->bindParam(':update_meal_id', $update_meal_id);
+						$stmt->execute();
 					
 					for($i = 1; $i <= $num_meal_ingredients; $i++){
 						$sql2 = "UPDATE miaddison_meals.ingredients SET";
@@ -166,16 +209,20 @@
 						$stmt3->execute();
 					}
 					
-					$displayMsg = "<h2>Your meal has recipe updated.</h2>";
-					$displayMsg .= "<h2>Please <a href='selectMeals.php'>view</a> your records.</h2>";
+					$displayMsg = "<h2>Your recipe has been updated.</h2>";
+					$displayMsg .= "<h3>Click <a href='adminViewMeal.php?meal_id=$update_meal_id'>here</a> to view your updated recipe.</h3>";
+					$displayMsg .= "<h3>You can click <a href='adminSelectMeals.php'>here</a> to view all recipes.</h3>";
 					
 				}else{
-					$sql = "INSERT INTO miaddison_meals.meals ( mealname ) VALUES (:mealName)";
-					//$sql = "INSERT INTO meals.meals ( mealname ) VALUES (:mealName)";
+					$sql = "INSERT INTO miaddison_meals.meals ( mealname, photo, update_date, update_time ) VALUES (:mealName, :photoName, :updateDate, :updateTime)";
+					//$sql = "INSERT INTO meals.meals ( mealname, photo ) VALUES (:mealName, :photoName)";
 				
 					//PREPARE the SQL statement
 					$stmt = $conn->prepare($sql);
 					$stmt->bindParam(':mealName', $meal_mealname);
+					$stmt->bindParam(':photoName', $photo_name);
+					$stmt->bindParam(':updateDate', $update_date);
+					$stmt->bindParam(':updateTime', $update_time);
 					$stmt->execute();
 					
 					$sql4 = "SELECT id FROM miaddison_meals.meals WHERE mealname= :mealName";
@@ -218,8 +265,9 @@
 						//echo $sql3;
 					}
 					
-					$displayMsg = "<h2>Your meal has been added.</h2>";
-					$displayMsg .= "<h2>Please <a href='selectMeals.php'>view</a> your records.</h2>";
+					$displayMsg = "<h2>Your recipe has been added.</h2>";
+					$displayMsg .= "<h3>Click <a href='adminViewMeal.php?meal_id=$meal_id'>here</a> to view your updated recipe.</h3>";
+					$displayMsg .= "<h3>You can click <a href='adminSelectMeals.php'>here</a> to view all recipes.</h3>";
 				
 				}
 				
@@ -235,9 +283,6 @@
 				
 				error_log(var_dump(debug_backtrace()));
 				
-				//Clean up any variables or connections that have been left hanging by this error.		
-			
-				//header('Location: files/505_error_response_page.php');	//sends control to a User friendly page					
 			}
 		}
 		else
@@ -245,11 +290,17 @@
 			$displayMsg = "<h2>Something went wrong</h2>";
 			$displayMsg .= "<h2>Update Recipe</h2>";
 			// Meal name input
-			$displayMsg .= "<form name='mealForm' method='post' action='mealForm.php'>";
+			$displayMsg .= "<form name='mealForm' method='post' action='adminMealForm.php' enctype='multipart/form-data'>";
 			$displayMsg .= "<p>&nbsp</p><table id='dataTable'>";
 			$displayMsg .= "<p><tr>";
 			$displayMsg .= "<label>Meal Name: ";
 			$displayMsg .= "<input type='text' name='meal_mealname' id='meal_mealname' value='$meal_mealname'><span class='error' style='color:red; padding-left:2em'>$meal_mealname_Err</span>";
+			$displayMsg .= "</label>";
+			$displayMsg .= "</tr></p>";
+			
+			$displayMsg .= "<p><tr>";
+			$displayMsg .= "<label>Meal Photo:";
+			$displayMsg .= "<input type='file' name='photo' id='photo'><span class='error' style='color:red; padding-left:2em'></span>";
 			$displayMsg .= "</label>";
 			$displayMsg .= "</tr></p>";
 					// ingredients
@@ -304,12 +355,12 @@
 				require 'dbConnectPDO.php'; // connect to the database
 				
 				// Remote SQL 
-				$sql = "SELECT mealname FROM miaddison_meals.meals WHERE id=:id";
+				$sql = "SELECT mealname, photo FROM miaddison_meals.meals WHERE id=:id";
 				$sql2 = "SELECT ingredient FROM miaddison_meals.ingredients WHERE id=:id";
 				$sql3 = "SELECT direction FROM miaddison_meals.directions WHERE id=:id";
 				
 				// Local SQL
-				//$sql = "SELECT mealname FROM meals.meals WHERE id=:id";
+				//$sql = "SELECT mealname, photo FROM meals.meals WHERE id=:id";
 				//$sql2 = "SELECT ingredient FROM meals.ingredients WHERE id=:id";
 				//$sql3 = "SELECT direction FROM meals.directions WHERE id=:id";
 				
@@ -335,13 +386,20 @@
 					$row=$stmt->fetch(PDO::FETCH_ASSOC);
 					$meal_mealname = $row['mealname'];
 					// Meal name input
-					$displayMsg .= "<form name='mealForm' method='post' action='mealForm.php'>";
+					$displayMsg .= "<form name='mealForm' method='post' action='adminMealForm.php' enctype='multipart/form-data'>";
 					$displayMsg .= "<p>&nbsp</p><table id='dataTable'>";
 					$displayMsg .= "<p><tr>";
 					$displayMsg .= "<label>Meal Name: ";
 					$displayMsg .= "<input type='text' name='meal_mealname' id='meal_mealname' value='$meal_mealname'><span class='error' style='color:red; padding-left:2em'>$meal_mealname_Err</span>";
 					$displayMsg .= "</label>";
 					$displayMsg .= "</tr></p>";
+					
+					$displayMsg .= "<p><tr>";
+					$displayMsg .= "<label>Meal Photo:";
+					$displayMsg .= "<input type='file' name='photo' id='photo'><span class='error' style='color:red; padding-left:2em'></span>";
+					$displayMsg .= "</label>";
+					$displayMsg .= "</tr></p>";
+					
 					// ingredients
 					//$displayMsg .= "<input type='button' value='Add Ingredient' onClick='addRow('dataTable')' />"; 
   					//$displayMsg .= "<input type='button' value='Remove Ingredient' onClick='deleteRow('dataTable')/>"; 
@@ -385,11 +443,16 @@
 			}else{
 				$displayMsg .= "<h2>Add new Recipe</h2>";
 				// Meal name input
-				$displayMsg .= "<form name='mealForm' method='post' action='mealForm.php'>";
+				$displayMsg .= "<form name='mealForm' method='post' action='adminMealForm.php' enctype='multipart/form-data'>";
 				$displayMsg .= "<div id = forminput>";
 				$displayMsg .= "<p>";
 				$displayMsg .= "<label>Meal Name:";
 				$displayMsg .= "<input type='text' name='meal_mealname' id='meal_mealname'><span class='error' style='color:red; padding-left:2em'></span>";
+				$displayMsg .= "</label>";
+				$displayMsg .= "</p>";
+				
+				$displayMsg .= "<label>Meal Photo:";
+				$displayMsg .= "<input type='file' name='photo' id='photo'><span class='error' style='color:red; padding-left:2em'></span>";
 				$displayMsg .= "</label>";
 				$displayMsg .= "</p>";
 				
@@ -398,7 +461,9 @@
 				
 				$displayMsg .= "<p><label for = 'number'>Number of Steps:</label>
 				<input id = 'num_meal_directions' name = 'num_meal_directions' value = ''></p>";
+				
 				$displayMsg .= "<p><a href='#' id='filldetails' onclick='addFields()' style = 'text-decoration: underline; font-size: 1em;'>Click here to submit number of ingredients and steps</a></p>";
+				
 				$displayMsg .= "<div id='jscontainer'></div>";
 				
 				$displayMsg .= "<p><input type='hidden' name='robotest' id='robotest'></p>";
@@ -433,103 +498,37 @@
 		}		
 				
 	}
+}else{
+	header('Location: login.php');
+}
 ?>
 <!DOCTYPE HTML>
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-<title>WDV341 Intro PHP - Create a form page for recipes</title>
-<script>
-	function resetForm(){
-		document.getElementById('meal_mealname').value = "";
-		document.getElementById('meal_ingredients').value = "";
-		document.getElementById('meal_directions').value = "";
-		//document.getElementById('event_date').value = "";
-		//document.getElementById('event_time').value = "";
-	}
-	function addFields(){
-     	// Number of inputs to create
-     	var number = document.getElementById("num_meal_ingredients").value;
-		var number2 = document.getElementById("num_meal_directions").value;
-     	// Container <div> where dynamic content will be placed
-     	var container = document.getElementById("jscontainer");
-     	// Clear previous contents of the container
-		while (container.hasChildNodes()) {
-			container.removeChild(container.lastChild);
-     	}
-     	container.appendChild(document.createElement("br"));
-     	for (i=0;i<number;i++){
-			// Append a node with a random text
-			container.appendChild(document.createTextNode("Ingredient " + (i+1) + ": "));
-			// Create an <input> element, set its type and name attributes
-			var input = document.createElement("input");
-			input.type = "text";
-			input.name = ("meal_ingredients".concat(i+1));
-			container.appendChild(input);
-			container.appendChild(document.createElement("br"));
-			container.appendChild(document.createElement("br"));
-    	}
-    	for (i=0;i<number2;i++){
-			// Append a node with a random text
-			container.appendChild(document.createTextNode("Step " + (i+1) + ": "));
-			// Create an <input> element, set its type and name attributes
-			var input = document.createElement("input");
-        	input.type = "text";
-        	input.name = ("meal_directions".concat(i+1));
-        	container.appendChild(input);
-			container.appendChild(document.createElement("br"));
-			container.appendChild(document.createElement("br"));
-    	}
-	}
-	function addRow(tableID) {
-		var table = document.getElementById(tableID);
-		var rowCount = table.rows.length;
-		if(rowCount < 5){                            // limit the user from creating fields more than your limits
-			var row = table.insertRow(rowCount);
-			var colCount = table.rows[0].cells.length;
-			for(var i=0; i <colCount; i++) {
-				var newcell = row.insertCell(i);
-				newcell.innerHTML = table.rows[0].cells[i].innerHTML;
-			}
-		}else{
-			 alert("Maximum Passenger per ticket is 5");
-
-		}
-	}
-
-	function deleteRow(tableID) {
-		var table = document.getElementById(tableID);
-		var rowCount = table.rows.length;
-		for(var i=0; i<rowCount; i++) {
-			var row = table.rows[i];
-			var chkbox = row.cells[0].childNodes[0];
-			if(null != chkbox && true == chkbox.checked) {
-				if(rowCount <= 1) {               // limit the user from removing all the fields
-					alert("Cannot Remove all the Passenger.");
-					break;
-				}
-				table.deleteRow(i);
-				rowCount--;
-				i--;
-			}
-		}
-	}
-</script>
+<title>Meal Planner Admin-Add or Modify Meal</title>
+	<script src = "scripts.js"></script>
 <link href= "adminstyle.css" rel= "stylesheet" type= "text/css"/>
 </head>
 
 <body>
 <div id = "container">
 <div id = "login">
-	<a href = "login.php">Login</a>
+	<a href = "adminSelectMeals.php"><?php echo $userMessage; ?></a>
+	<a href = "login.php"><img src="images/login.png" alt="Login" style="width:25px;hieght:25px;"></a>
+	<a href = "logout.php"><img src="images/logout.png" alt="Logout" style="width:25px;hieght:25px;"></a>
 </div>
 <header>
-	<h1>Add or Update Recipe</h1>
+	<h1>Meal Planner Admin</h1>
 </header>
 <nav>
 	<ul>
-		<li><a href = "selectMeals.php">View All</a></li>
-		<li><a href = "mealForm.php">Add New</a></li>
+		<li><a href = "index.php">Home</a></li>
+		<li><a href = "mealPick.php">Meal Planner</a></li>
+		<li><a href = "selectMeals.php">View All Recipes</a></li>
+		<li><a href = "contactForm.php">Contact Us</a></li>
+		<li><a href = "adminSelectMeals.php">View and Modify Recipes</a></li>
+		<li><a href = "adminMealForm.php">Add New Recipe</a></li>
 	</ul>
 </nav>
 <main>

@@ -18,12 +18,19 @@ body{
 
 #login{
 	float: right;
-	font-size: 0.6em;
+	font-size: 1em;
 }
 
 #login a:link {
 	color: white;
 	text-decoration: underline;
+	display: inline-block;
+	padding-bottom: 3px;
+}
+#login img{
+	display: inline-block;
+	margin-bottom: 0;
+	padding-bottom: 0;
 }
 
 a{

@@ -1,9 +1,16 @@
 <?php
-
+session_start();
 //The following section of PHP acts as the Controller.  It contains the processing logic
 //needed to gather the data from the database table.  Format the data into a presentation
 //format that can be viewed on the client's browser.
 	$displayMsg = "";
+	$userMessage = "";
+
+	if (isset($_SESSION['validUser']) && $_SESSION['validUser'] == "yes")				//is this already a valid user?
+	{			//User is already signed on.  Skip the rest.
+		$username = $_SESSION['username'];			
+		$userMessage = "Welcome Back $username!";	//Create greeting for VIEW area		
+	}	
 	
 try
 {
@@ -12,12 +19,12 @@ try
 	include 'dbConnectPDO.php';				//connects to the database
 	
 	// Remote SQL
-	$sql = "SELECT mealname FROM miaddison_meals.meals WHERE id = :id";
+	$sql = "SELECT mealname, photo FROM miaddison_meals.meals WHERE id = :id";
 	$sql2 = "SELECT ingredient FROM miaddison_meals.ingredients WHERE id = :id";
 	$sql3 = "SELECT direction FROM miaddison_meals.directions WHERE id = :id";
 	
 	// Local SQL
-	//$sql = "SELECT mealname FROM meals.meals WHERE id = :id";
+	//$sql = "SELECT mealname, photo FROM meals.meals WHERE id = :id";
 	//$sql2 = "SELECT ingredient FROM meals.ingredients WHERE id = :id";
 	//$sql3 = "SELECT direction FROM meals.directions WHERE id = :id";
 
@@ -41,7 +48,8 @@ try
 		{
 			//display recipe name
 			$row = $stmt->fetch(PDO::FETCH_ASSOC);
-			$displayMsg = "<h2 class = center>".$row["mealname"]."</h2>";	
+			$displayMsg .= '<p class = center><img src = "images/'.$row["photo"].'" alt="recipe photo" style="max-height:400px; max-width:400px"></p>';
+			$displayMsg .= "<h2 class = center>".$row["mealname"]."</h2>";	
 					
 			//begin bullet list of ingredients
 			$displayMsg .= "<ul>";
@@ -95,19 +103,26 @@ finally
 ?>
 <html>
 <head>
-	<title>View Recipe</title>
+	<title>Meal Planner-View Recipe</title>
 	<link href= "style.css" rel= "stylesheet" type= "text/css"/>
 	<link href = "printstyle.css" rel = "stylesheet" type = "text/css" media = "print" />
 </head>
 <body>
 <div id = "container">
+<div id = "login">
+	<a href = "adminSelectMeals.php"><?php echo $userMessage; ?></a>
+	<a href = "login.php"><img src="images/login.png" alt="Login" style="width:25px;hieght:25px;"></a>
+	<a href = "logout.php"><img src="images/logout.png" alt="Logout" style="width:25px;hieght:25px;"></a>
+</div>
 <header>
-	<h1>View Recipe</h1>
+	<h1>Menu Planner</h1>
 </header>
 <nav>
 	<ul>
-		<li><a href = "selectMeals.php">View All</a></li>
-		<li><a href = "mealForm.php">Add New</a></li>
+		<li><a href = "index.php">Home</a></li>
+		<li><a href = "mealPick.php">Meal Planner</a></li>
+		<li><a href = "selectMeals.php">View All Recipes</a></li>
+		<li><a href = "contactForm.php">Contact Us</a></li>
 	</ul>
 </nav>
 <main>
