@@ -23,6 +23,9 @@ function printDiv(divID) {
             //Restore orignal HTML
             document.body.innerHTML = oldPage;
 }
+function checkDelete(){
+	return confirm('Are you sure you want to delete this?');
+}
 	function addFields(){
      	// Number of inputs to create
      	var number = document.getElementById("num_meal_ingredients").value;

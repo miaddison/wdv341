@@ -22,7 +22,6 @@ $userMessage = "";
 	if(isset($_POST["submit"]) && !empty($_POST["submit"]))
 	{
 		$num_meals = $_POST['mealnum'];
-		$_SESSION['mealNum'] = $num_meals;
 		$roboTest = $_POST['robotest'];
 
 
@@ -38,6 +37,7 @@ $userMessage = "";
 
 		$validForm = true;
 		validateNumMeals($num_meals);
+		$_SESSION['mealNum'] = $num_meals;
 
 		// validate not robot
 		if($roboTest){

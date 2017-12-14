@@ -76,6 +76,7 @@ if ($_SESSION['validUser'] == "yes") {
 	<title>Menu Planner Admin-Delete Recipes</title>
 	<link href= "adminstyle.css" rel= "stylesheet" type= "text/css"/>
 	<link href = "printstyle.css" rel = "stylesheet" type = "text/css" media = "print" />
+	<script src = "scripts.js"></script>
 </head>
 <body>
 <div id = "container">

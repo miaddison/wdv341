@@ -29,85 +29,76 @@ if ($_SESSION['validUser'] == "yes") {
 
 		// Error messages
 		$meal_mealname_Err = "";
+		$photo_name_Err="";
 		$meal_ingredients_Err = "";
 		$meal_directions_Err = "";	
 		
 		// flags for sucessful form submission
 		$validForm = false;
-		
-		//for($i = 0; $i < $num_meal_ingredients; $i++){
-			//$GLOBALS['$meal_ingredients'.$i] = null;
-			//$var = ${'meal_ingredients'.$i};
-			//global $$var;
-		//}
-		//for($i = 0; $i < $num_meal_directions; $i++){
-			//$GLOBALS['$meal_directions'.$i] = null;
-			//$var = ${'meal_directions'.$i};
-			//global $$var;
-		//}
 	
 	if(isset($_POST["submit"]))
 	{
 		// the form has been sumitted and needs to be processed
-		
-		// check that photo was uploaded without errors
-		if(isset($_FILES['photo']) && $_FILES['photo']['error'] == 0){
-			$allowed = array("jpg" => "image/jpg", "jpeg" => "image/jpeg", "gif" => "image/gif", "png" => "image/png");
-			$photo_name = $_FILES['photo']['name'];
-			//echo $photo_name;
-			$photo_type = $_FILES['photo']['type'];
-			
-			// Verify file extension
-			$ext = pathinfo($photo_name, PATHINFO_EXTENSION);
-			if(!array_key_exists($ext, $allowed)) die("Error: Please select a valid file format.");
-				
-			// Verify file type
-			if(in_array($photo_type, $allowed)){
-				// Check whether file exists before uploading
-				if(file_exists("images/".$_FILES['photo']['name'])){
-					//echo $_FILES['photo']['name']." already exists.";
-				}else{
-					move_uploaded_file($_FILES['photo']['tmp_name'], "images/".$_FILES['photo']['name']);
-					//echo "Your file was uploaded successfully.";
-				}
-			}else{
-				$displayMsg .= "<h2>Error: there was a problem uploading your file. Please try again.</h2>";
-			}
-		}else{
-			//echo "Error: ".$_FILES['photo']['error'];
-		}
-		
+		// retreive variables from post
 		$num_meal_ingredients = $_POST['num_meal_ingredients'];
 		$num_meal_directions = $_POST['num_meal_directions'];
+		$update_meal_id = $_POST['update_meal_id'];
 		$meal_mealname = $_POST['meal_mealname'];
-		//echo $num_meal_ingredients;
-		//echo $num_meal_directions;
+		$roboTest = $_POST['robotest'];
+			
+		// create meal ingredients variables for all ingredients
 		for($i = 1; $i <= $num_meal_ingredients; $i++){
-			//global ${'meal_ingredients'.$i};
-			//${'meal_ingredients'.$i} = $_POST['meal_ingredients'.$i];
-			//$meal_ingredients.$i = $_POST['meal_ingredients'.$i];
 			$var = "meal_ingredients".$i;
 			$GLOBALS['meal_ingredients'.$i] = $_POST[$var];
 		}
+		
+		// create meal direction variables for all directions
 		for($i = 1; $i <= $num_meal_directions; $i++){
-			//${'meal_directions'.$i} = $_POST['meal_directions'.$i];
-			//global ${'meal_ingredients'.$i};
 			$var = "meal_directions".$i;
 			$GLOBALS['meal_directions'.$i] = $_POST[$var];
 		}
-		$update_meal_id = $_POST['update_meal_id'];
-		$roboTest = $_POST['robotest'];
+		
 
 		/*	FORM VALIDATION PLAN
 		
 			FIELD NAME			VALIDATION TESTS & VALID RESPONSES
 			Meal Name			Required Field		May not be empty
-			
+			Meal Photo			Check added and valid type
 			Meal ingredients	Optional
 			Meal directions		Optional
 		*/
-		
 		// Validation Functions
+		//validate photo
+		function validatePhoto(){
+			global $validForm, $photo_name_Err; // use global versions of these variables
+			// check that photo was uploaded without errors
+			if(isset($_FILES['photo']) && $_FILES['photo']['error'] == 0){
+				$allowed = array("jpg" => "image/jpg", "jpeg" => "image/jpeg", "gif" => "image/gif", "png" => "image/png");
+				$photo_name = $_FILES['photo']['name'];
+				//echo $photo_name;
+				$photo_type = $_FILES['photo']['type'];
+
+				// Verify file extension
+				$ext = pathinfo($photo_name, PATHINFO_EXTENSION);
+				if(!array_key_exists($ext, $allowed)){
+					//die("Error: Please select a valid file format.");
+					$photo_name_Err = "*Please select a valid file format.";
+					$validForm=false;
+				}
+				// Verify file type
+				if(in_array($photo_type, $allowed)){
+					// Check whether file exists before uploading
+					if(file_exists("images/".$_FILES['photo']['name'])){
+						//echo $_FILES['photo']['name']." already exists.";
+					}else{
+						move_uploaded_file($_FILES['photo']['tmp_name'], "images/".$_FILES['photo']['name']);
+						//echo "Your file was uploaded successfully.";
+					}
+				}else{
+					$displayMsg .= "<h2>Error: there was a problem uploading your file. Please try again.</h2>";
+				}
+			}
+		}
 		// Validate name - required and check HTML special characters
 		function validateSanitizeMealName($meal_mealname){
 			global $validForm, $meal_mealname_Err;	//Use the GLOBAL Version of these variables instead of making them local
@@ -143,10 +134,11 @@ if ($_SESSION['validUser'] == "yes") {
 		// Set form valid and run methods to check if anything is invalid
 		$validForm = true;
 		$meal_mealname = validateSanitizeMealName($meal_mealname); 
-		if($meal_mealname == ""){
+		validatePhoto();
+		/*if($meal_mealname == ""){
 			$validForm = false;
 			$meal_mealname_Err = "*You must enter a name for the recipe.";
-		}
+		}*/
 		for($i = 1; $i <= $num_meal_ingredients; $i++){
 			${'meal_ingredients'.$i} = validateSanitizeMealIngredients(${'meal_ingredients'.$i});
 		}
@@ -156,16 +148,19 @@ if ($_SESSION['validUser'] == "yes") {
 		
 		if($validForm)
 		{
-			$displayMsg = "<h2>All good</h2>";
+			//$displayMsg = "<h2>All good</h2>";
 			try 
 			{
 				
 				require 'dbConnectPDO.php'; // connect to the database
 	
-				if($update_meal_id!=""){
+				if($update_meal_id!=""){ // check to see if passing in id which flags as update instead of insert
+						// update meal name
 						$sql = "UPDATE miaddison_meals.meals SET";
 						//$sql = "UPDATE meals.meals SET";
 						$sql .= " mealname=:mealName,";
+						
+						// check to see if new photo added. If so, update, if not, do not.
 						if($photo_name!=""){
 							$sql .= " photo=:mealPhoto,";
 						}
@@ -176,7 +171,7 @@ if ($_SESSION['validUser'] == "yes") {
 						//PREPARE the SQL statement
 						$stmt = $conn->prepare($sql);
 						$stmt->bindParam(':mealName', $meal_mealname);
-						if($photo_name!=""){
+						if($photo_name!=""){ // only bind photo name parameter if updating
 							$stmt->bindParam(':mealPhoto', $photo_name);
 						}
 						$stmt->bindParam(':updateDate', $update_date);
@@ -184,12 +179,13 @@ if ($_SESSION['validUser'] == "yes") {
 						$stmt->bindParam(':update_meal_id', $update_meal_id);
 						$stmt->execute();
 					
+					// update ingredients
 					for($i = 1; $i <= $num_meal_ingredients; $i++){
 						$sql2 = "UPDATE miaddison_meals.ingredients SET";
 						//$sql2 = "UPDATE meals.ingredients SET";
 						$sql2 .= " ingredient=:mealIngredients";
 						$sql2 .= " WHERE id=:update_meal_id AND num=:number";
-						
+						//prepare sql statement
 						$stmt2 = $conn->prepare($sql2);
 						$stmt2->bindParam(':mealIngredients', ${'meal_ingredients'.$i});
 						$stmt2->bindParam(':number', $i);
@@ -197,11 +193,13 @@ if ($_SESSION['validUser'] == "yes") {
 						$stmt2->execute();
 					}
 					
+					// update directions
 					for($i = 1; $i <= $num_meal_directions; $i++){
 						$sql3 = "UPDATE miaddison_meals.directions SET";
 						//$sql3 = "UPDATE meals.directions SET";
 						$sql3 .= " direction=:mealDirections";
 						$sql3 .= " WHERE id=:update_meal_id AND step=:number";
+						
 						$stmt3 = $conn->prepare($sql3);
 						$stmt3->bindParam(':number', $i);
 						$stmt3->bindParam(':mealDirections', ${'meal_directions'.$i});
@@ -209,6 +207,7 @@ if ($_SESSION['validUser'] == "yes") {
 						$stmt3->execute();
 					}
 					
+					//confirm update to user and display links
 					$displayMsg = "<h2>Your recipe has been updated.</h2>";
 					$displayMsg .= "<h3>Click <a href='adminViewMeal.php?meal_id=$update_meal_id'>here</a> to view your updated recipe.</h3>";
 					$displayMsg .= "<h3>You can click <a href='adminSelectMeals.php'>here</a> to view all recipes.</h3>";
@@ -227,8 +226,6 @@ if ($_SESSION['validUser'] == "yes") {
 					
 					$sql4 = "SELECT id FROM miaddison_meals.meals WHERE mealname= :mealName";
 					//$sql4 = "SELECT id FROM meals.meals WHERE mealname= :mealName";
-					//echo(" SQL4: ".$sql4);
-					//echo(" prepare statement ");
 					
 					//PREPARE the SQL statement
 					$stmt4 = $conn->prepare($sql4);
@@ -238,7 +235,8 @@ if ($_SESSION['validUser'] == "yes") {
 					// get new meals id
 					$row4=$stmt4->fetch(PDO::FETCH_ASSOC);
 					$meal_id = $row4['id'];
-					//echo(" meal id: ".$meal_id);
+					
+					//insert ingredients into table
 					for($mi = 1; $mi <= $num_meal_ingredients; $mi++){
 						$sql2 = "INSERT INTO miaddison_meals.ingredients (";
 						//$sql2 = "INSERT INTO meals.ingredients (";
@@ -251,7 +249,8 @@ if ($_SESSION['validUser'] == "yes") {
 						$stmt2->execute();
 						//echo $sql2;
 					}
-					//echo $num_meal_directions;
+					
+					//insert directions into table
 					for($di = 1; $di <= $num_meal_directions; $di++){
 						$sql3 = "INSERT INTO miaddison_meals.directions (";
 						//$sql3 = "INSERT INTO meals.directions (";
@@ -265,14 +264,11 @@ if ($_SESSION['validUser'] == "yes") {
 						//echo $sql3;
 					}
 					
+					// confirm added to user and display links
 					$displayMsg = "<h2>Your recipe has been added.</h2>";
 					$displayMsg .= "<h3>Click <a href='adminViewMeal.php?meal_id=$meal_id'>here</a> to view your updated recipe.</h3>";
 					$displayMsg .= "<h3>You can click <a href='adminSelectMeals.php'>here</a> to view all recipes.</h3>";
-				
 				}
-				
-				
-				
 			}
 			
 			catch(PDOException $e)
@@ -300,7 +296,7 @@ if ($_SESSION['validUser'] == "yes") {
 			
 			$displayMsg .= "<p><tr>";
 			$displayMsg .= "<label>Meal Photo:";
-			$displayMsg .= "<input type='file' name='photo' id='photo'><span class='error' style='color:red; padding-left:2em'></span>";
+			$displayMsg .= "<input type='file' name='photo' id='photo' value='$photo_name'><span class='error' style='color:red; padding-left:2em'>$photo_name_Err</span>";
 			$displayMsg .= "</label>";
 			$displayMsg .= "</tr></p>";
 					// ingredients
@@ -339,7 +335,7 @@ if ($_SESSION['validUser'] == "yes") {
 			$displayMsg .= "<input type='hidden' name='robotest' id='robotest'>";
 			$displayMsg .= "<p>";
 			// buttons
-			$displayMsg .= "<input type='button' name='button2' id='button2' value='Reset' onClick = resetForm()>";
+			$displayMsg .= "<a href=adminMealForm.php><input type='button' name='button2' id='button2' value='Reset'></a>";
 			$displayMsg .= "<input type='submit' name='submit' id='submit' value='Submit'>";
 			$displayMsg .= "</p></table></form>";
 		}
@@ -396,7 +392,7 @@ if ($_SESSION['validUser'] == "yes") {
 					
 					$displayMsg .= "<p><tr>";
 					$displayMsg .= "<label>Meal Photo:";
-					$displayMsg .= "<input type='file' name='photo' id='photo'><span class='error' style='color:red; padding-left:2em'></span>";
+					$displayMsg .= "<input type='file' name='photo' id='photo' value='$photo_name'><span class='error' style='color:red; padding-left:2em'>$photo_name_Err</span>";
 					$displayMsg .= "</label>";
 					$displayMsg .= "</tr></p>";
 					
@@ -434,7 +430,7 @@ if ($_SESSION['validUser'] == "yes") {
 					$displayMsg .= "<input type='hidden' name='robotest' id='robotest'>";
 					$displayMsg .= "<p>";
 					// buttons
-					$displayMsg .= "<input type='button' name='button2' id='button2' value='Reset' onClick = resetForm()>";
+					$displayMsg .= "<a href='adminMealForm.php?meal_id=$update_meal_id'><input type='button' name='button2' id='button2' value='Reset'></a>";
 					$displayMsg .= "<input type='submit' name='submit' id='submit' value='Submit'>";
 					$displayMsg .= "</p></table></form>";
 				}else{
@@ -452,7 +448,7 @@ if ($_SESSION['validUser'] == "yes") {
 				$displayMsg .= "</p>";
 				
 				$displayMsg .= "<label>Meal Photo:";
-				$displayMsg .= "<input type='file' name='photo' id='photo'><span class='error' style='color:red; padding-left:2em'></span>";
+				$displayMsg .= "<input type='file' name='photo' id='photo' value='$photo_name'><span class='error' style='color:red; padding-left:2em'>$photo_name_Err</span>";
 				$displayMsg .= "</label>";
 				$displayMsg .= "</p>";
 				
@@ -483,14 +479,9 @@ if ($_SESSION['validUser'] == "yes") {
 				
 			//error_log($e->errorInfo());
 			error_log($e->getMessage());
-			//error_log($conn->errorCode());
-			//error_log($conn->connect_error);
 			error_log(var_dump(debug_backtrace()));
 								
-			//Clean up any variables or connections that have been left hanging by this error.	
-			
-			//header('Location: files/505_error_response_page.php');	
-			//sends control to a User friendly page					
+			//Clean up any variables or connections that have been left hanging by this error.			
 		}
 		finally
 		{

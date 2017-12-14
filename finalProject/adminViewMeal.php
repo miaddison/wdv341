@@ -59,7 +59,7 @@ if ($_SESSION['validUser'] == "yes") {
 				//$displayMsg .= "<a href='adminMealForm.php?meal_id=$meal_id'><input style = 'float: left; margin-left:35%' type='button' value='Update Recipe'/></a>";
 				//$displayMsg .= "<a href='adminDeleteMeal.php?meal_id=$meal_id'><input style = 'float: right; margin-right:35%' type='button' value='Delete Recipe'/></a>";
 				$displayMsg .= "<a href='adminMealForm.php?meal_id=$meal_id'><input style='margin:1%' type='button' value='Update Recipe'/></a>";
-				$displayMsg .= "<a href='adminDeleteMeal.php?meal_id=$meal_id'><input style='margin:1%' type='button' value='Delete Recipe'/></a>";
+				$displayMsg .= "<a href='adminDeleteMeal.php?meal_id=$meal_id'><input style='margin:1%' type='button' onclick='return checkDelete()' value='Delete Recipe'/></a>";
 				$displayMsg .= "</div><!--end buttons div-->";
 				//$displayMsg .="</form>";
 				//$displayMsg .= "<a href='adminMealForm.php?meal_id=$meal_id'><button>Modify Recipe</button></a>";
@@ -85,14 +85,14 @@ if ($_SESSION['validUser'] == "yes") {
 			else 
 			{
 				$displayMsg .= "0 results";
-				$displayMsg .= "<p>Please <a href='selectMeals.php'>view</a> your recipes.</p>";
+				$displayMsg .= "<p>Please <a href='adminSelectMeals.php'>view</a> your recipes.</p>";
 			}		
 		}
 		else
 		{
 			//display error message for DEVELOPMENT purposes
 			$displayMsg .= "<h3>Sorry there has been a problem</h3>";
-			$displayMsg .= "<p>Please <a href='selectMeals.php'>view</a> your recipes.</p>";
+			$displayMsg .= "<p>Please <a href='adminSelectMeals.php'>view</a> your recipes.</p>";
 		}
 	}
 	catch(PDOException $e)
@@ -120,6 +120,7 @@ if ($_SESSION['validUser'] == "yes") {
 	<title>Meal Planner Admin-View Recipe</title>
 	<link href= "adminstyle.css" rel= "stylesheet" type= "text/css"/>
 	<link href = "printstyle.css" rel = "stylesheet" type = "text/css" media = "print" />
+	<script src = "scripts.js"></script>
 </head>
 <body>
 <div id = "container">

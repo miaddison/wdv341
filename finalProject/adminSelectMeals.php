@@ -35,14 +35,15 @@ if ($_SESSION['validUser'] == "yes")	//If this is a valid user allow access to t
 
 				while($row = $stmt->fetch(PDO::FETCH_ASSOC)){
 					$displayMsg .= "<tr><td>";
-					$displayMsg .= $row["mealname"];
+					$meal_name = $row["mealname"];
+					$displayMsg .= $meal_name;
 					$displayMsg .= "</td><td>";
 					$meal_id = $row["id"];
 					$displayMsg .= "<a href='adminViewMeal.php?meal_id=$meal_id'>  View  </a>";
 					$displayMsg .= "</td><td>";
 					$displayMsg .= "<a href='adminMealForm.php?meal_id=$meal_id'>  Modify  </a>";
 					$displayMsg .= "</td><td>";
-					$displayMsg .= "<a href='adminDeleteMeal.php?meal_id=$meal_id'>  Delete  </a>";
+					$displayMsg .= "<a href='adminDeleteMeal.php?meal_id=$meal_id' onclick='return checkDelete()'>  Delete  </a>";
 					$displayMsg .= "</td></tr>";
 				}
 
@@ -84,6 +85,7 @@ if ($_SESSION['validUser'] == "yes")	//If this is a valid user allow access to t
 <head>
 	<title>Meal Planner Admin-Select Recipes</title>
 	<link href= "adminstyle.css" rel= "stylesheet" type= "text/css"/>
+	<script src = "scripts.js"></script>
 </head>
 <body>
 <div id = "container">
